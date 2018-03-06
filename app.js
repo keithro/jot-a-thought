@@ -5,6 +5,7 @@ const methodOverride = require('method-override'); // for PUT and DELETE methods
 const flash = require('connect-flash'); // flash messages
 const session = require('express-session'); // session storage - used for flash messages and authentication
 const bodyParser = require('body-parser');
+const passport = require('passport');
 const mongoose = require('mongoose');
 
 const app = express();
@@ -12,6 +13,9 @@ const app = express();
 // Load Routes
 const ideas = require('./routes/ideas');
 const users = require('./routes/users');
+
+// Passport Config
+require('./config/passport')(passport);
 
 // Map global promise
 mongoose.Promise = global.Promise;
@@ -43,6 +47,10 @@ app.use(session({
   saveUninitialized: true
 }));
 
+// Passport Middleware - this must come after Express Session Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Flash Middleware
 app.use(flash());
 
@@ -51,6 +59,7 @@ app.use(function(req, res, next) {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.error = req.flash('error');
+  res.locals.user = req.user || null;
   next();
 })
 
