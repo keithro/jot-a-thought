@@ -16,13 +16,13 @@ const users = require('./routes/users');
 
 // Passport Config
 require('./config/passport')(passport);
+// DB Config
+const db = require('./config/database');
 
 // Map global promise
 mongoose.Promise = global.Promise;
 // Connect to mongoose
-mongoose.connect('mongodb://localhost/jot-a-thought', {
-  // useMongoClient: true // No longer needed
-})
+mongoose.connect(db.mongoURI)
   .then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err));
 
@@ -86,7 +86,7 @@ app.get('/about', (req, res) => {
 app.use('/ideas', ideas);
 app.use('/users', users);
 
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
